@@ -28,8 +28,8 @@ round:
 | Gemini 4 Neon | `gemini-4-neon` | `xhigh` |
 
 If a member is unavailable, or only at a different model or effort, report it
-instead of substituting. Ask whether to run without it; run short-handed only if
-the user agrees, and never with fewer than two members.
+instead of substituting, and run the council with the members that are
+available.
 
 ## Starting the members
 
@@ -43,16 +43,14 @@ once, then call `delegate_task` once per member in the same turn, with
 
 If `orchestrator_capabilities` lists different ids or option names, use what it
 lists. If a member's provider is disabled (`canRunChildTask: false`), or lacks
-its model or `xhigh`, report that and ask before running short-handed (see
-Members). Each new round is a new `delegate_task`, not a message to an earlier
-delegate.
+its model or `xhigh`, report that and go on without it (see Members). Each new
+round is a new `delegate_task`, not a message to an earlier delegate.
 
 **In Claude Code outside T3:** Gemini 4 Neon runs only through T3 Code's
-Antigravity provider, and this skill has no CLI command for it. Tell the user,
-and ask whether to run the council with Opus and Sol only. If they agree, run
-those two as CLI processes, each in its own Bash call with
-`run_in_background: true` (an xhigh run can outlast the 10-minute foreground
-limit), both from the project root:
+Antigravity provider, and this skill has no CLI command for it. Tell the user
+it is not running, and run Opus and Sol as CLI processes, each in its own Bash
+call with `run_in_background: true` (an xhigh run can outlast the 10-minute
+foreground limit), both from the project root:
 
 ```bash
 codex exec -m gpt-6.1-sol -c model_reasoning_effort=xhigh -s read-only --skip-git-repo-check -C <project-root> -o <sol-out-file> "Read the council brief at <brief-file> and follow it."
@@ -67,7 +65,7 @@ claude -p "Read the council brief at <brief-file> and follow it." --model claude
 - When you are notified that both exited, read the two output files.
   `<sol-out-file>` holds only Sol's final answer. If a run failed, show the user
   its error (not logged in, model unavailable, usage limit) instead of switching
-  models.
+  models, and go on with the members that ran.
 
 Put the brief and output files outside the project (your scratchpad directory,
 else the system temp directory) and use new names each round, so they never show
@@ -121,6 +119,6 @@ Rounds: 2
 ```
 
 If a delegate gives no score, write `no score`. Do not invent one. If a member
-did not take part because the user agreed to run without it, write `not run`.
+was unavailable and did not take part, write `not run`.
 If the PR is open, edit the description. Do not post a comment for this.
 If there is no PR, put the same results in the final reply only.
